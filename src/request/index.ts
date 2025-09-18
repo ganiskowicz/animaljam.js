@@ -27,7 +27,7 @@ export class Request {
    * @param userOptions Default options for the request.
    * @returns Promise<AnimalJamResponse<T>>
    */
-  public async send<T = any>(url: string, { includeHost = true, ...userOptions }: AnimalJamRequestOptions): Promise<AnimalJamResponse<T>> {
+  public async send<T = any>(url: string, { includeHost = true, inflateBuffer = true, hashParam = true, ...userOptions }: AnimalJamRequestOptions): Promise<AnimalJamResponse<T>> {
     const options = defaultsDeep(userOptions, {
       headers: {
         ...this.deaultHeaders ?? userOptions.headers ?? {},
@@ -40,7 +40,7 @@ export class Request {
     /**
      * More than likely the deploy version will be included in the url.
      */
-    if (options.param) url = `${url.replace(/\[deploy_version\]/g, this.deployVersion)}/${this.hash(options.param)}`
+    if (options.param) url = `${url.replace(/\[deploy_version\]/g, this.deployVersion)}/${hashParam ? this.hash(options.param) : options.param}`
     if (options.timeout) options.disp
 
     const response = await fetch(url, options)
@@ -58,7 +58,7 @@ export class Request {
         break
       case 'binary/octet-stream':
         const buffer = Buffer.from(await response.arrayBuffer())
-        animalResponse.data = userOptions.objectMode ? Object.values(await this.decompress(buffer, options.rawDecompress)) as T : await this.decompress(buffer, options.rawDecompress) as T
+        animalResponse.data = userOptions.objectMode ? Object.values(await this.decompress(buffer, options.rawDecompress, inflateBuffer)) as T : await this.decompress(buffer, options.rawDecompress, inflateBuffer) as T
         break
       case 'application/json; charset=utf-8':
         animalResponse.data = await response.json() as T
@@ -84,17 +84,17 @@ export class Request {
    * @param buffer The buffer to decompress.
    * @returns {Promise<object>}
    */
-  private async decompress(buffer: Buffer, rawDecompress: boolean): Promise<object> {
+  private async decompress(buffer: Buffer, rawDecompress: boolean, inflateBuffer: boolean): Promise<object> {
     const amfjs = await import('amfjs');
     const { AMF3, AMFDecoder } = amfjs.default ?? amfjs;
 
-    const decompressed = await new Promise<Buffer>((resolve, reject) => rawDecompress ? inflateRaw(buffer, (error, decoded) => {
+    const decompressed = inflateBuffer ? (await new Promise<Buffer>((resolve, reject) => rawDecompress ? inflateRaw(buffer, (error, decoded) => {
       if (error) reject(error)
       else resolve(decoded)
     }) : inflate(buffer, (error, decoded) => {
       if (error) reject(error)
       else resolve(decoded)
-    }))
+    }))) : buffer
 
     const stream = new Readable()
     stream.push(decompressed)

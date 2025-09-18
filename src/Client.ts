@@ -3,6 +3,9 @@ import AsarRepository from './repositories/asar'
 import { AudioRepository } from './repositories/audio'
 import { AuthenticatorRepository } from './repositories/authenticator'
 import { DefPackRepository } from './repositories/defpack'
+import { ImageArrayRepository } from './repositories/imagearray'
+import { ItemRepository } from './repositories/item'
+import { MediaRepository } from './repositories/media'
 import { FlashvarsRepository } from './repositories/flashvars'
 import { MasterpieceRepository } from './repositories/masterpiece'
 import { NetworkingRepository } from './repositories/networking'
@@ -30,6 +33,21 @@ export class AnimalJamClient {
    * Defpack repository.
    */
   public readonly defpack: DefPackRepository = new DefPackRepository(this)
+
+  /**
+   * Imagearray repository.
+   */
+  public readonly imagearray: ImageArrayRepository = new ImageArrayRepository(this)
+
+  /**
+   * Imagearray repository.
+   */
+  public readonly item: ItemRepository = new ItemRepository(this)
+
+  /**
+   * Media repository.
+   */
+  public readonly media: MediaRepository = new MediaRepository(this)
 
   /**
    * Asar repository.

@@ -37,12 +37,14 @@
     "node-fetch": "^3.3.2",
     "p-limit": "^6.1.0",
     "sharp": "^0.33.5",
-    "xmlbuilder2": "^3.1.1"
+    "xmlbuilder2": "^3.1.1",
+    "jimp": "^1.6.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.12.7",
     "eslint": "^9.1.0",
+    "fix-esm-import-path": "^1.10.3",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^5.0.5",
     "typescript": "^5.7.0-dev.20240920"
